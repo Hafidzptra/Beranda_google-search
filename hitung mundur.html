@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hitung Mundur Hari</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .countdown-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #countdown {
+            font-size: 2em;
+            margin-top: 20px;
+        }
+
+        input[type="datetime-local"] {
+            padding: 10px;
+            font-size: 1em;
+        }
+
+        button, #resetButton {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        #resetButton {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="countdown-container">
+        <h1>Hitung Mundur ke Event</h1>
+        <div id="input-container">
+            <input type="datetime-local" id="eventDate" />
+            <button onclick="startCountdown()">Mulai Hitung Mundur</button>
+        </div>
+        <button id="resetButton" onclick="resetCountdown()">Hapus Timer</button>
+
+        <div id="countdown">
+            0 hari 0 jam 0 menit 0 detik
+        </div>
+    </div>
+
+    <script>
+        var countdownFunction;
+
+        // Minta izin untuk notifikasi
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(function (permission) {
+                    console.log("Izin notifikasi: ", permission);  // Log hasil izin
+                    if (permission === "granted") {
+                        console.log("Izin notifikasi diberikan.");
+                    } else {
+                        console.log("Notifikasi ditolak.");
+                    }
+                });
+            } else {
+                console.log("Browser tidak mendukung notifikasi.");
+            }
+        }
+
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification() {
+            console.log("Memanggil fungsi notifikasi..."); // Debug log
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("Hitung mundur selesai!", {
+                    body: "Event telah dimulai.",
+                    icon: "https://via.placeholder.com/150" // Ganti dengan URL ikon jika diperlukan
+                });
+                console.log("Notifikasi ditampilkan.");
+            } else {
+                console.log("Izin notifikasi tidak diberikan atau tidak didukung.");
+            }
+        }
+
+        // Fungsi untuk memulai hitungan mundur
+        function startCountdown() {
+            // Hentikan hitungan mundur sebelumnya jika ada
+            if (countdownFunction) {
+                clearInterval(countdownFunction);
+            }
+
+            // Ambil tanggal yang diinput oleh pengguna
+            var eventDate = document.getElementById("eventDate").value;
+            if (!eventDate) {
+                alert("Silakan pilih tanggal acara.");
+                return;
+            }
+
+            // Simpan tanggal ke Local Storage
+            localStorage.setItem("savedEventDate", eventDate);
+
+            // Sembunyikan input tanggal dan tombol
+            document.getElementById("input-container").style.display = "none";
+
+            // Mulai hitungan mundur
+            calculateCountdown(eventDate);
+        }
+
+        // Fungsi untuk menghitung mundur
+        function calculateCountdown(eventDate) {
+            var countDownDate = new Date(eventDate).getTime();
+
+            countdownFunction = setInterval(function() {
+                var now = new Date().getTime();
+                var distance = countDownDate - now;
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Tampilkan hasil hitungan mundur
+                document.getElementById("countdown").innerHTML =
+                    days + " hari " + hours + " jam " + minutes + " menit " + seconds + " detik";
+
+                // Jika hitung mundur selesai
+                if (distance < 0) {
+                    clearInterval(countdownFunction);
+                    document.getElementById("countdown").innerHTML = "Event telah dimulai!";
+                    console.log("Hitung mundur selesai."); // Debug log
+                    showNotification(); // Tampilkan notifikasi saat hitungan mundur selesai
+                }
+            }, 1000);
+        }
+
+        // Fungsi untuk menghapus timer dan Local Storage
+        function resetCountdown() {
+            // Hentikan hitungan mundur
+            if (countdownFunction) {
+                clearInterval(countdownFunction);
+            }
+
+            // Hapus tanggal dari Local Storage
+            localStorage.removeItem("savedEventDate");
+
+            // Setel ulang tampilan
+            document.getElementById("countdown").innerHTML = "0 hari 0 jam 0 menit 0 detik";
+            document.getElementById("eventDate").value = "";
+
+            // Tampilkan kembali input tanggal dan tombol
+            document.getElementById("input-container").style.display = "block";
+        }
+
+        // Cek apakah ada tanggal yang tersimpan di Local Storage
+        window.onload = function() {
+            var savedEventDate = localStorage.getItem("savedEventDate");
+
+            // Minta izin notifikasi
+            requestNotificationPermission();
+
+            // Jika ada, otomatis mulai hitungan mundur
+            if (savedEventDate) {
+                document.getElementById("eventDate").value = savedEventDate;
+                document.getElementById("input-container").style.display = "none"; // Sembunyikan input dan tombol jika ada tanggal tersimpan
+                calculateCountdown(savedEventDate);
+            }
+        }
+    </script>
+</body>
+</html>

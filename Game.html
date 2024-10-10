@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Pastikan file CSS Anda disertakan dengan benar -->
+    <style>
+    	/* CSS untuk rata tengah header dan kartu */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif; /* Sesuaikan dengan preferensi font Anda */
+    background-color: #f0f0f0; /* Warna latar belakang halaman */
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #333;
+    margin: 10px 0;
+}
+
+header img {
+    max-width: 200px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+.cards .red {
+    background-color: #8B8B8B;
+}
+
+.cards .blue {
+    background-color: #8B8B8B;
+}
+
+.cards .green {
+    background-color: #8B8B8B;
+}
+.cards .yellow {
+    background-color: #8B8B8B;
+}
+
+.cards .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 200px;
+    width: 345px;
+    border-radius: 40px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.4s, filter 0.4s;
+}
+
+.cards .card p.tip {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.cards .card p.second-text {
+    font-size: 0.7em;
+}
+
+.cards .card:hover {
+    transform: scale(1.1);
+}
+
+.cards:hover > .card:not(:hover) {
+    filter: blur(10px);
+    transform: scale(0.9);
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #ddd;
+}
+
+</style>
+</head>
+<body>
+    <header>
+        <h1>Game</h1>
+    </header>
+    <div class="cards">
+        <div class="card red">
+            <p class="tip">Tic Tac Toe</p>
+            <a href="Tictactoe.html">Mainkan</a>
+        </div>
+        <div class="card green">
+            <p class="tip">Krunker</p>
+            <a href="https://krunker.io/" target="_blank">Mainkan</a>
+        </div>
+        <div class="card yellow">
+            <p class="tip">Tetris</p>
+            <a href="tetris.html" target="_blank">Mainkan</a>
+        </div>
+        <div class="card blue">
+        	<p class="tip">minesweeper</p>
+            <a href="minesweeper.html" target="_blank">Mainkan</a>
+    </div>
+    <footer>
+        <p>© 2024.Dibuat oleh hafidz. dengan HTML dan CSS dari uiverse.io</p>
+    </footer>
+</body>
+</html>

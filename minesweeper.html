@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MineSweeper</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    #game-board {
+      display: grid;
+      margin: 20px auto;
+      gap: 2px;
+    }
+
+    .cell {
+      width: 40px;
+      height: 40px;
+      background-color: #8f8f8f;
+      border: 2px solid #ccc;
+      font-size: 18px;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .cell.revealed {
+      background-color: #e0e0e0;
+      cursor: default;
+    }
+
+    .cell.mine {
+      background-color: red;
+    }
+
+    .cell.flagged {
+      background-color: #ffd700;
+    }
+
+    /* Gaya untuk menu kontekstual */
+    .context-menu {
+      position: absolute;
+      display: none;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .context-menu button {
+      display: block;
+      padding: 5px 10px;
+      background: none;
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .context-menu button:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>MineSweeper</h1>
+  <div id="game-board"></div>
+  <div id="context-menu" class="context-menu">
+    <button id="flag-option">🚩 Flag</button>
+    <button id="reveal-option">🕵️ Reveal</button>
+  </div>
+
+  <script>
+    const boardSize = 10;
+    const mineCount = 10;
+    const gameBoard = document.getElementById('game-board');
+    const contextMenu = document.getElementById('context-menu');
+    let board = [];
+    let revealedCells = 0;
+    let currentCell = null;
+
+    function createBoard() {
+      gameBoard.style.gridTemplateColumns = `repeat(${boardSize}, 40px)`;
+      gameBoard.style.gridTemplateRows = `repeat(${boardSize}, 40px)`;
+
+      for (let i = 0; i < boardSize; i++) {
+        board[i] = [];
+        for (let j = 0; j < boardSize; j++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.dataset.row = i;
+          cell.dataset.col = j;
+          cell.addEventListener('click', (event) => handleCellClick(event, i, j));
+          gameBoard.appendChild(cell);
+          board[i][j] = { mine: false, revealed: false, flagged: false, element: cell, adjacentMines: 0 };
+        }
+      }
+      placeMines();
+    }
+
+    function placeMines() {
+      let placedMines = 0;
+      while (placedMines < mineCount) {
+        const row = Math.floor(Math.random() * boardSize);
+        const col = Math.floor(Math.random() * boardSize);
+        if (!board[row][col].mine) {
+          board[row][col].mine = true;
+          placedMines++;
+        }
+      }
+      calculateAdjacentMines();
+    }
+
+    function calculateAdjacentMines() {
+      const directions = [
+        [-1, -1], [-1, 0], [-1, 1],
+        [0, -1],         [0, 1],
+        [1, -1], [1, 0], [1, 1]
+      ];
+      for (let i = 0; i < boardSize; i++) {
+        for (let j = 0; j < boardSize; j++) {
+          if (!board[i][j].mine) {
+            directions.forEach(([dx, dy]) => {
+              const newRow = i + dx;
+              const newCol = j + dy;
+              if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
+                if (board[newRow][newCol].mine) {
+                  board[i][j].adjacentMines++;
+                }
+              }
+            });
+          }
+        }
+      }
+    }
+
+    function handleCellClick(event, row, col) {
+      currentCell = { row, col };
+      const cellRect = event.target.getBoundingClientRect();
+      contextMenu.style.left = `${cellRect.left + window.scrollX}px`;
+      contextMenu.style.top = `${cellRect.top + window.scrollY}px`;
+      contextMenu.style.display = 'block';
+    }
+
+    // Event listener untuk flag
+    document.getElementById('flag-option').addEventListener('click', () => {
+      flagCell(currentCell.row, currentCell.col);
+      contextMenu.style.display = 'none';
+    });
+
+    // Event listener untuk membuka sel
+    document.getElementById('reveal-option').addEventListener('click', () => {
+      revealCell(currentCell.row, currentCell.col);
+      contextMenu.style.display = 'none';
+    });
+
+    function flagCell(row, col) {
+      const cell = board[row][col];
+      if (cell.revealed) return;
+
+      cell.flagged = !cell.flagged;
+      cell.element.classList.toggle('flagged', cell.flagged);
+    }
+
+    function revealCell(row, col) {
+      const cell = board[row][col];
+      if (cell.revealed || cell.flagged) return;
+
+      cell.revealed = true;
+      revealedCells++;
+      cell.element.classList.add('revealed');
+
+      if (cell.mine) {
+        cell.element.classList.add('mine');
+        alert('Game Over! kamu menekan bom.');
+        resetGame();
+        return;
+      }
+
+      if (cell.adjacentMines > 0) {
+        cell.element.textContent = cell.adjacentMines;
+      } else {
+        revealAdjacentCells(row, col);
+      }
+
+      if (revealedCells === boardSize * boardSize - mineCount) {
+        alert('Selamat! kamu memenangkan game ini.');
+        resetGame();
+      }
+    }
+
+    function revealAdjacentCells(row, col) {
+      const directions = [
+        [-1, -1], [-1, 0], [-1, 1],
+        [0, -1],         [0, 1],
+        [1, -1], [1, 0], [1, 1]
+      ];
+      directions.forEach(([dx, dy]) => {
+        const newRow = row + dx;
+        const newCol = col + dy;
+        if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
+          revealCell(newRow, newCol);
+        }
+      });
+    }
+
+    function resetGame() {
+      gameBoard.innerHTML = '';
+      board = [];
+      revealedCells = 0;
+      createBoard();
+    }
+
+    // Hanya tutup context menu jika area luar diklik, bukan tombol di menu
+    window.addEventListener('click', (e) => {
+      if (!contextMenu.contains(e.target) && !e.target.classList.contains('cell')) {
+        contextMenu.style.display = 'none';
+      }
+    });
+
+    createBoard();
+  </script>
+</body>
+</html>

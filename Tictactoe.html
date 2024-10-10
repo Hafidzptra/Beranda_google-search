@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            flex-direction: column; /* Baris tambahan untuk mengatur tata letak elemen secara vertikal */
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin-top: 20px; /* Margin atas untuk menjaga jarak antara tombol dan papan */
+        }
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            font-size: 2em;
+            cursor: pointer;
+            user-select: none;
+        }
+        .cell:hover {
+            background-color: #e0e0e0;
+        }
+        #modeSelection {
+            margin-bottom: 20px; /* Margin bawah untuk menjaga jarak antara tombol dan papan */
+        }
+        #score {
+            margin-top: 20px; /* Margin atas untuk skor */
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="modeSelection">
+        <button id="friendBtn">Main dengan Teman</button>
+        <button id="robotBtn">Main dengan Robot</button>
+        <div id="difficultyOptions" style="display: none;">
+            <button id="easyBtn">Mudah</button>
+            <button id="mediumBtn">Sedang</button>
+            <button id="hardBtn">Sulit</button>
+        </div>
+    </div>
+
+    <div id="score">
+    <p>Skor:</p>
+    <p>Pemain X: <span id="playerXScore">0</span></p>
+    <p>Pemain O: <span id="playerOScore">0</span></p>
+    <button id="resetScoreBtn">Reset Skor</button>
+</div>
+
+
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const cells = document.querySelectorAll('.cell');
+        const playerXScoreElement = document.getElementById('playerXScore');
+        const playerOScoreElement = document.getElementById('playerOScore');
+        let currentPlayer = 'X';
+        let gameMode = ''; // 'friend' untuk bermain dengan teman, 'robot' untuk bermain dengan robot
+        let robotDifficulty = ''; // 'easy', 'medium', atau 'hard'
+        let playerXScore = 0;
+        let playerOScore = 0;
+        const boardState = Array(cells.length).fill(null);
+        const winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        // Fungsi untuk memeriksa pemenang
+        function checkWinner() {
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+                    alert(`${boardState[a]} is the winner!`);
+                    updateScore(boardState[a]); // Update skor berdasarkan pemenang
+                    resetGame();
+                    return;
+                }
+            }
+
+            if (boardState.every(cell => cell !== null)) {
+                alert('It\'s a tie!');
+                resetGame();
+            }
+        }
+
+        // Fungsi untuk mereset permainan
+        function resetGame() {
+            boardState.fill(null);
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+            currentPlayer = 'X';
+        }
+
+        // Fungsi untuk menangani klik sel
+        function handleCellClick(event) {
+            const cell = event.target;
+            const index = cell.dataset.index;
+
+            if (boardState[index] !== null) return;
+
+            boardState[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+            checkWinner();
+
+            if (gameMode === 'robot') {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // Ganti giliran
+                handleRobotTurn();
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // Ganti giliran
+            }
+        }
+
+        // Fungsi untuk menangani giliran robot
+        function handleRobotTurn() {
+            switch (robotDifficulty) {
+                case 'easy':
+                    playEasy();
+                    break;
+                case 'medium':
+                    playMedium();
+                    break;
+                case 'hard':
+                    playHard();
+                    break;
+                default:
+                    playMedium(); // Default mode medium
+                    break;
+            }
+        }
+
+        // Logika untuk mode mudah
+        function playEasy() {
+            const availableCells = Array.from(cells).filter(cell => !cell.textContent);
+            const randomIndex = Math.floor(Math.random() * availableCells.length);
+            const selectedCell = availableCells[randomIndex];
+            const index = selectedCell.dataset.index;
+
+            boardState[index] = currentPlayer;
+            selectedCell.textContent = currentPlayer;
+            checkWinner();
+
+            currentPlayer = 'X'; // Ganti giliran kembali ke pemain manusia setelah robot
+        }
+
+        // Logika untuk mode sedang
+        function playMedium() {
+            const availableCells = Array.from(cells).filter(cell => !cell.textContent);
+            const randomIndex = Math.floor(Math.random() * availableCells.length);
+            const selectedCell = availableCells[randomIndex];
+            const index = selectedCell.dataset.index;
+
+            boardState[index] = currentPlayer;
+            selectedCell.textContent = currentPlayer;
+            checkWinner();
+
+            currentPlayer = 'X'; // Ganti giliran kembali ke pemain manusia setelah robot
+        }
+
+        // Logika untuk mode sulit
+        function playHard() {
+            // Implementasi logika untuk mode sulit (misalnya, menggunakan algoritma minimax)
+            // Placeholder untuk mode sulit
+            const availableCells = Array.from(cells).filter(cell => !cell.textContent);
+            const randomIndex = Math.floor(Math.random() * availableCells.length);
+            const selectedCell = availableCells[randomIndex];
+            const index = selectedCell.dataset.index;
+
+            boardState[index] = currentPlayer;
+            selectedCell.textContent = currentPlayer;
+            checkWinner();
+
+            currentPlayer = 'X'; // Ganti giliran kembali ke pemain manusia setelah robot
+        }
+
+        // Selector untuk tombol reset skor
+const resetScoreBtn = document.getElementById('resetScoreBtn');
+
+// Event listener untuk tombol reset skor
+resetScoreBtn.addEventListener('click', () => {
+    playerXScore = 0;
+    playerOScore = 0;
+    playerXScoreElement.textContent = playerXScore;
+    playerOScoreElement.textContent = playerOScore;
+});
+
+// Fungsi untuk mengupdate skor
+function updateScore(winner) {
+    if (winner === 'X') {
+        playerXScore++;
+        playerXScoreElement.textContent = playerXScore;
+    } else if (winner === 'O') {
+        playerOScore++;
+        playerOScoreElement.textContent = playerOScore;
+    }
+}
+
+
+        // Fungsi untuk menyiapkan tombol mode permainan
+        function setupGameModeButtons() {
+            const friendBtn = document.getElementById('friendBtn');
+            const robotBtn = document.getElementById('robotBtn');
+            const easyBtn = document.getElementById('easyBtn');
+            const mediumBtn = document.getElementById('mediumBtn');
+            const hardBtn = document.getElementById('hardBtn');
+            const difficultyOptions = document.getElementById('difficultyOptions');
+
+            // Event listener untuk tombol 'Main dengan Teman'
+            friendBtn.addEventListener('click', () => {
+                gameMode = 'friend'; // Set mode permainan ke 'friend'
+                difficultyOptions.style.display = 'none'; // Sembunyikan opsi tingkat kesulitan jika ditampilkan sebelumnya
+                resetGame(); // Reset permainan
+            });
+
+            // Event listener untuk tombol 'Main dengan Robot'
+            robotBtn.addEventListener('click', () => {
+                gameMode = 'robot'; // Set mode permainan ke 'robot'
+                difficultyOptions.style.display = 'block'; // Tampilkan opsi tingkat kesulitan
+                resetGame(); // Reset permainan
+            });
+
+            // Event listener untuk tombol 'Mudah'
+            easyBtn.addEventListener('click', () =>{
+        robotDifficulty = 'easy'; // Set tingkat kesulitan robot ke 'mudah'
+        resetGame(); // Reset permainan
+        currentPlayer = 'X'; // Mulai dengan pemain manusia (X)
+        handleRobotTurn(); // Mulai giliran robot
+        difficultyOptions.style.display = 'none'; // Sembunyikan opsi tingkat kesulitan setelah dipilih
+    });
+
+    // Event listener untuk tombol 'Sedang'
+    mediumBtn.addEventListener('click', () => {
+        robotDifficulty = 'medium'; // Set tingkat kesulitan robot ke 'sedang'
+        resetGame(); // Reset permainan
+        currentPlayer = 'X'; // Mulai dengan pemain manusia (X)
+        handleRobotTurn(); // Mulai giliran robot
+        difficultyOptions.style.display = 'none'; // Sembunyikan opsi tingkat kesulitan setelah dipilih
+    });
+
+    // Event listener untuk tombol 'Sulit'
+    hardBtn.addEventListener('click', () => {
+        robotDifficulty = 'hard'; // Set tingkat kesulitan robot ke 'sulit'
+        resetGame(); // Reset permainan
+        currentPlayer = 'X'; // Mulai dengan pemain manusia (X)
+        handleRobotTurn(); // Mulai giliran robot
+        difficultyOptions.style.display = 'none'; // Sembunyikan opsi tingkat kesulitan setelah dipilih
+    });
+}
+
+// Tambahkan event listener untuk setiap sel pada papan
+cells.forEach(cell => {
+    cell.addEventListener('click', handleCellClick);
+});
+
+// Panggil fungsi setupGameModeButtons untuk menyiapkan tombol mode permainan
+setupGameModeButtons();
+
+    </script>
+</body>
+</html>
+
+            	
