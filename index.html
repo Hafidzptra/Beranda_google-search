@@ -508,12 +508,12 @@ body.innerHTML = `                `;
         window.onload = function() {
             const savedCity = localStorage.getItem('city');
             if (savedCity) {
-                document.getElementById('cityName').innerText = `Lokasi: ${savedCity}`;
+                document.getElementById('cityName').innerText = `${savedCity}`;
             }
         }
 
         function displayWeather(city, temperature, description, icon) {
-            document.getElementById('cityName').innerText = `Lokasi: ${city}`;
+            document.getElementById('cityName').innerText = `${city}`;
             document.getElementById('temperature').innerText = `${temperature}°C`;
             document.getElementById('description').innerText = description;
             document.getElementById('weatherIcon').src = icon;
