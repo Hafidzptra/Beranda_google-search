@@ -504,90 +504,109 @@ body.innerHTML = `                `;
             "Soreang": { latitude: -7.021260, longitude: 107.529453 }
         };
 
-        // Memuat data cuaca dari localStorage jika tersedia
+        // Memuat lokasi dari localStorage jika tersedia
         window.onload = function() {
-            const savedWeather = localStorage.getItem('weather');
-            if (savedWeather) {
-                const weather = JSON.parse(savedWeather);
-                displayWeather(weather.city, weather.temperature, weather.description, weather.icon);
+            const savedCity = localStorage.getItem('city');
+            if (savedCity) {
+                document.getElementById('cityName').innerText = `Lokasi: ${savedCity}`;
             }
         }
 
-        // Fungsi untuk menampilkan data cuaca
         function displayWeather(city, temperature, description, icon) {
-            document.getElementById('cityName').innerText = ` ${city}`;
+            document.getElementById('cityName').innerText = `Lokasi: ${city}`;
             document.getElementById('temperature').innerText = `${temperature}°C`;
             document.getElementById('description').innerText = description;
             document.getElementById('weatherIcon').src = icon;
         }
 
-        // Fungsi untuk membuka modal
         function openModal() {
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // Fungsi untuk menutup modal
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
         }
 
-        // Fungsi untuk mengambil cuaca
-        async function fetchWeather() {
-            const city = document.getElementById('city').value.trim();
-            if (city) {
-                // Cek apakah nama kota ada di daftar koordinat
-                const coordinates = cities[city];
-
-                if (coordinates) {
-                    // Jika kota ditemukan, ambil cuaca berdasarkan koordinat
-                    const { latitude, longitude } = coordinates;
-                    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=Asia/Jakarta`;
-
-                    const weatherResponse = await fetch(weatherUrl);
-                    const weatherData = await weatherResponse.json();
-
-                    // Mendapatkan kode cuaca
-                    const weatherCode = weatherData.current_weather.weathercode;
-
                     // Menambahkan deskripsi cuaca dan ikon berdasarkan kode
                     const weatherDescriptions = {
-                        0: { description: 'Cerah', icon: 'https://img.icons8.com/ios-filled/50/000000/sun.png' },
-                        1: { description: 'Cerah dengan sedikit awan', icon: 'https://img.icons8.com/ios-filled/50/000000/sun.png' },
-                        2: { description: 'Berawan', icon: 'https://img.icons8.com/ios-filled/50/000000/cloud.png' },
-                        3: { description: 'Awan tebal', icon: 'https://img.icons8.com/ios-filled/50/000000/cloud.png' },
-                        45: { description: 'Kabut', icon: 'https://img.icons8.com/ios-filled/50/000000/fog.png' },
-                        48: { description: 'Kabut dengan embun beku', icon: 'https://img.icons8.com/ios-filled/50/000000/fog.png' },
-                        51: { description: 'Hujan ringan', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-                        53: { description: 'Hujan sedang', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-                        55: { description: 'Hujan lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-                        61: { description: 'Hujan gerimis', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-                        63: { description: 'Hujan', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-                        65: { description: 'Hujan deras', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-                        66: { description: 'Hujan es ringan', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-                        67: { description: 'Hujan es lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-                        71: { description: 'Salju ringan', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-                        73: { description: 'Salju sedang', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-                        75: { description: 'Salju lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-                        95: { description: 'Badai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
-                        96: { description: 'Badai petir dengan hujan es', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
-                        99: { description: 'Badai petir dengan salju', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' }
-                    };
+    0: { description: 'Cerah', icon: 'https://img.icons8.com/ios-filled/50/000000/sun.png' },
+    1: { description: 'Cerah dengan sedikit awan', icon: 'https://img.icons8.com/ios-filled/50/000000/sun.png' },
+    2: { description: 'Berawan', icon: 'https://img.icons8.com/ios-filled/50/000000/cloud.png' },
+    3: { description: 'Awan tebal', icon: 'https://img.icons8.com/ios-filled/50/000000/cloud.png' },
+    45: { description: 'Kabut', icon: 'https://img.icons8.com/ios-filled/50/000000/fog.png' },  // Perbarui ikon kabut
+    51: { description: 'Hujan ringan', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    53: { description: 'Hujan sedang', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    55: { description: 'Hujan lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    56: { description: 'Hujan ringan asam', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    57: { description: 'Hujan lebat asam', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    61: { description: 'Hujan ringan disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon hujan petir
+    63: { description: 'Hujan sedang disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
+    65: { description: 'Hujan lebat disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
+    66: { description: 'Hujan ringan es', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    67: { description: 'Hujan lebat es', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    71: { description: 'Salju ringan', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
+    73: { description: 'Salju sedang', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
+    75: { description: 'Salju lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
+    77: { description: 'Kristal salju', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
+    80: { description: 'Hujan lokal', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
+    81: { description: 'Hujan lokal disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon hujan lokal
+    82: { description: 'Hujan lokal lebat disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
+    85: { description: 'Salju lokal', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
+    86: { description: 'Salju lokal lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
+    95: { description: 'Badai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon badai petir
+    96: { description: 'Badai petir dengan salju', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon badai petir dengan salju
+    99: { description: 'Badai petir dengan hujan es', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon badai petir dengan hujan es
+    default: { description: 'Cuaca tidak diketahui', icon: '' }
+};
 
-                    const weather = weatherDescriptions[weatherCode] || { description: 'Tidak diketahui', icon: '' };
+                    async function fetchWeather() {
+    const city = document.getElementById('city').value.trim();
+    if (city) {
+        const coordinates = cities[city];
+        if (coordinates) {
+            const { latitude, longitude } = coordinates;
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=Asia/Jakarta`;
 
-                    displayWeather(city, weatherData.current_weather.temperature, weather.description, weather.icon);
+            try {
+                const weatherResponse = await fetch(weatherUrl);
+                if (!weatherResponse.ok) {
+                    throw new Error(`HTTP Error: ${weatherResponse.status}`);
+                }
 
-                    // Simpan nama kota ke localStorage
+                const weatherData = await weatherResponse.json();
+                console.log("Weather Data:", weatherData); // Log data yang diterima
+                if (weatherData && weatherData.current_weather) {
+                    const weatherCode = weatherData.current_weather.weathercode;
+                    const temperature = weatherData.current_weather.temperature;
+
+                    // Log kode cuaca yang diterima
+                    console.log("Weather Code:", weatherCode);
+                    console.log("Temperature:", temperature);
+
+                    // Ambil deskripsi cuaca berdasarkan kode
+                    const weather = weatherDescriptions[weatherCode] || weatherDescriptions.default;
+                    console.log("Weather Description:", weather.description); // Log deskripsi cuaca
+
+                    displayWeather(city, temperature, weather.description, weather.icon);
+
+                    // Simpan kota ke localStorage
                     localStorage.setItem('city', city);
 
                     closeModal();
                 } else {
-                    alert('Kota tidak ditemukan. Pastikan ejaan kota benar atau coba kota lain.');
+                    alert('Data cuaca tidak lengkap.');
                 }
-            } else {
-                alert('Masukkan nama kota');
+            } catch (error) {
+                console.error('Kesalahan mengambil data cuaca:', error.message);
+                alert('Terjadi kesalahan saat mengambil data cuaca. Coba lagi.');
             }
+        } else {
+            alert('Kota tidak ditemukan. Pastikan nama kota benar.');
         }
+    } else {
+        alert('Masukkan nama kota.');
+    }
+}
   </script>
 </body>
 </html>
