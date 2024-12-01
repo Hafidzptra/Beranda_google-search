@@ -251,7 +251,7 @@
   position: fixed;
   top:10px;
   right: 10px;
-  background-color: white;
+  background-color: #DFDFDF;
   padding: 5px 10px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -529,34 +529,30 @@ body.innerHTML = `                `;
 
                     // Menambahkan deskripsi cuaca dan ikon berdasarkan kode
                     const weatherDescriptions = {
-    0: { description: 'Cerah', icon: 'https://img.icons8.com/ios-filled/50/000000/sun.png' },
-    1: { description: 'Cerah dengan sedikit awan', icon: 'https://img.icons8.com/ios-filled/50/000000/sun.png' },
-    2: { description: 'Berawan', icon: 'https://img.icons8.com/ios-filled/50/000000/cloud.png' },
-    3: { description: 'Awan tebal', icon: 'https://img.icons8.com/ios-filled/50/000000/cloud.png' },
-    45: { description: 'Kabut', icon: 'https://img.icons8.com/ios-filled/50/000000/fog.png' },  // Perbarui ikon kabut
-    51: { description: 'Hujan ringan', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    53: { description: 'Hujan sedang', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    55: { description: 'Hujan lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    56: { description: 'Hujan ringan asam', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    57: { description: 'Hujan lebat asam', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    61: { description: 'Hujan ringan disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon hujan petir
-    63: { description: 'Hujan sedang disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
-    65: { description: 'Hujan lebat disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
-    66: { description: 'Hujan ringan es', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    67: { description: 'Hujan lebat es', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    71: { description: 'Salju ringan', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-    73: { description: 'Salju sedang', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-    75: { description: 'Salju lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-    77: { description: 'Kristal salju', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-    80: { description: 'Hujan lokal', icon: 'https://img.icons8.com/ios-filled/50/000000/rain.png' },
-    81: { description: 'Hujan lokal disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon hujan lokal
-    82: { description: 'Hujan lokal lebat disertai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },
-    85: { description: 'Salju lokal', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-    86: { description: 'Salju lokal lebat', icon: 'https://img.icons8.com/ios-filled/50/000000/snow.png' },
-    95: { description: 'Badai petir', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon badai petir
-    96: { description: 'Badai petir dengan salju', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon badai petir dengan salju
-    99: { description: 'Badai petir dengan hujan es', icon: 'https://img.icons8.com/ios-filled/50/000000/thunderstorm.png' },  // Perbarui ikon badai petir dengan hujan es
-    default: { description: 'Cuaca tidak diketahui', icon: '' }
+    0: { description: 'Cerah', icon: 'https://openweathermap.org/img/wn/01d.png' },
+    1: { description: 'Cerah dengan sedikit awan', icon: 'https://openweathermap.org/img/wn/02d.png' },
+    2: { description: 'Berawan', icon: 'https://openweathermap.org/img/wn/03d.png' },
+    3: { description: 'Awan tebal', icon: 'https://openweathermap.org/img/wn/04d.png' },
+    45: { description: 'Kabut', icon: 'https://openweathermap.org/img/wn/50d.png' },
+    51: { description: 'Hujan ringan', icon: 'https://openweathermap.org/img/wn/10d.png' },
+    53: { description: 'Hujan sedang', icon: 'https://openweathermap.org/img/wn/09d.png' },
+    55: { description: 'Hujan lebat', icon: 'https://openweathermap.org/img/wn/11d.png' },
+    61: { description: 'Hujan ringan disertai petir', icon: 'https://openweathermap.org/img/wn/11d.png' },
+    63: { description: 'Hujan sedang disertai petir', icon: 'https://openweathermap.org/img/wn/11d.png' },
+    65: { description: 'Hujan lebat disertai petir', icon: 'https://openweathermap.org/img/wn/11d.png' },
+    66: { description: 'Hujan salju', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    67: { description: 'Hujan salju lebat', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    71: { description: 'Salju ringan', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    73: { description: 'Salju sedang', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    75: { description: 'Salju lebat', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    77: { description: 'Salju dengan angin kencang', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    80: { description: 'Hujan es ringan', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    81: { description: 'Hujan es sedang', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    82: { description: 'Hujan es lebat', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    95: { description: 'Badai petir', icon: 'https://openweathermap.org/img/wn/11d.png' },
+    96: { description: 'Badai petir dengan salju', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    99: { description: 'Badai petir dengan hujan es', icon: 'https://openweathermap.org/img/wn/13d.png' },
+    default: { description: 'Cuaca tidak diketahui', icon: 'https://openweathermap.org/img/wn/50d.png' }
 };
 
                     async function fetchWeather() {
