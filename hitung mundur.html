@@ -3,181 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hitung Mundur Hari</title>
+    <title>Count Day</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
+            background-color: #FFFFFF;
+            color: black;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
         }
 
         .countdown-container {
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
+            background-color: #DEDEDE;
+            padding: 20px; 
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
 
-        #countdown {
-            font-size: 2em;
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.8rem;
+            font-weight: bold;
             margin-top: 20px;
         }
 
-        input[type="datetime-local"] {
-            padding: 10px;
-            font-size: 1em;
+        .digit {
+            position: relative;
+            width: 40px;
+            height: 60px;
+            overflow: hidden;
         }
 
-        button, #resetButton {
-            padding: 10px 20px;
-            font-size: 1em;
-            margin-top: 10px;
+        .digit span {
+            display: block;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+        }
+        .digit#days {
+            width: auto;
+            min-width: 80px;
+		}
+
+        .digit span.next {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .digit span.current {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .digit span.previous {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        .transition-bar {
+            position: absolute;
+            top: 45%;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            background-color: #DEDEDE;
+            transform: translateY(100%);
+            opacity: 0;            
+        }
+        
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .controls input,
+        .controls button {
+            padding: 8px 12px;
+            margin-right: 10px;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .controls button {
+            background-color: #383838;
+            color: white;
             cursor: pointer;
         }
 
-        #resetButton {
-            background-color: red;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .controls button:hover {
+            background-color: #FF0B00;
+        }
+
+        .countdown.hidden {
+            display: none;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="countdown-container">
-        <h1>Hitung Mundur ke Event</h1>
-        <div id="input-container">
-            <input type="datetime-local" id="eventDate" />
-            <button onclick="startCountdown()">Mulai Hitung Mundur</button>
-        </div>
-        <button id="resetButton" onclick="resetCountdown()">Hapus Timer</button>
 
-        <div id="countdown">
-            0 hari 0 jam 0 menit 0 detik
+    <div class="countdown-container">
+        <h1>Hitung Mundur</h1>
+        <div class="countdown hidden">
+            <div class="digit" id="days">
+                <span class="current"></span>
+                <span class="next"></span>
+            </div>
+            <div class="label">Hari</div>
+
+            <div class="digit" id="hours">
+                <span class="current"></span>
+                <span class="next"></span>
+            </div>
+            <div class="label">Jam</div>
+
+            <div class="digit" id="minutes">
+                <span class="current"></span>
+                <span class="next"></span>
+            </div>
+            <div class="label">Menit</div>
+
+            <div class="digit" id="seconds">
+                <span class="current"></span>
+                <span class="next"></span>
+            </div>
+            <div class="label">Detik</div>
+        </div>
+        <div class="controls">
+            <input type="datetime-local" id="dateInput" />
+            <button id="setBtn" onclick="setCountdown()">Set Countdown</button>
+            <button id="clearBtn" onclick="clearCountdown()" class="hidden">Hapus Countdown</button>
         </div>
     </div>
 
     <script>
-        var countdownFunction;
+        let countdownInterval;
 
-        // Minta izin untuk notifikasi
-        function requestNotificationPermission() {
-            if ("Notification" in window) {
-                Notification.requestPermission().then(function (permission) {
-                    console.log("Izin notifikasi: ", permission);  // Log hasil izin
-                    if (permission === "granted") {
-                        console.log("Izin notifikasi diberikan.");
-                    } else {
-                        console.log("Notifikasi ditolak.");
-                    }
-                });
-            } else {
-                console.log("Browser tidak mendukung notifikasi.");
-            }
-        }
+        function startCountdown(targetDate) {
+            if (countdownInterval) clearInterval(countdownInterval);
 
-        // Fungsi untuk menampilkan notifikasi
-        function showNotification() {
-            console.log("Memanggil fungsi notifikasi..."); // Debug log
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification("Hitung mundur selesai!", {
-                    body: "Event telah dimulai.",
-                    icon: "https://via.placeholder.com/150" // Ganti dengan URL ikon jika diperlukan
-                });
-                console.log("Notifikasi ditampilkan.");
-            } else {
-                console.log("Izin notifikasi tidak diberikan atau tidak didukung.");
-            }
-        }
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
 
-        // Fungsi untuk memulai hitungan mundur
-        function startCountdown() {
-            // Hentikan hitungan mundur sebelumnya jika ada
-            if (countdownFunction) {
-                clearInterval(countdownFunction);
-            }
-
-            // Ambil tanggal yang diinput oleh pengguna
-            var eventDate = document.getElementById("eventDate").value;
-            if (!eventDate) {
-                alert("Silakan pilih tanggal acara.");
-                return;
-            }
-
-            // Simpan tanggal ke Local Storage
-            localStorage.setItem("savedEventDate", eventDate);
-
-            // Sembunyikan input tanggal dan tombol
-            document.getElementById("input-container").style.display = "none";
-
-            // Mulai hitungan mundur
-            calculateCountdown(eventDate);
-        }
-
-        // Fungsi untuk menghitung mundur
-        function calculateCountdown(eventDate) {
-            var countDownDate = new Date(eventDate).getTime();
-
-            countdownFunction = setInterval(function() {
-                var now = new Date().getTime();
-                var distance = countDownDate - now;
-
-                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                // Tampilkan hasil hitungan mundur
-                document.getElementById("countdown").innerHTML =
-                    days + " hari " + hours + " jam " + minutes + " menit " + seconds + " detik";
-
-                // Jika hitung mundur selesai
                 if (distance < 0) {
-                    clearInterval(countdownFunction);
-                    document.getElementById("countdown").innerHTML = "Event telah dimulai!";
-                    console.log("Hitung mundur selesai."); // Debug log
-                    showNotification(); // Tampilkan notifikasi saat hitungan mundur selesai
+                    clearInterval(countdownInterval);
+                    return;
                 }
-            }, 1000);
-        }
 
-        // Fungsi untuk menghapus timer dan Local Storage
-        function resetCountdown() {
-            // Hentikan hitungan mundur
-            if (countdownFunction) {
-                clearInterval(countdownFunction);
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                animateDigit("days", days);
+                animateDigit("hours", hours);
+                animateDigit("minutes", minutes);
+                animateDigit("seconds", seconds);
+
+                localStorage.setItem('targetDate', targetDate);
             }
 
-            // Hapus tanggal dari Local Storage
-            localStorage.removeItem("savedEventDate");
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
 
-            // Setel ulang tampilan
-            document.getElementById("countdown").innerHTML = "0 hari 0 jam 0 menit 0 detik";
-            document.getElementById("eventDate").value = "";
-
-            // Tampilkan kembali input tanggal dan tombol
-            document.getElementById("input-container").style.display = "block";
+            // Hide input and buttons after setting countdown
+            document.getElementById('dateInput').style.display = 'none';
+            document.getElementById('setBtn').style.display = 'none';
+            document.getElementById('clearBtn').classList.remove('hidden');
         }
 
-        // Cek apakah ada tanggal yang tersimpan di Local Storage
-        window.onload = function() {
-            var savedEventDate = localStorage.getItem("savedEventDate");
+        function animateDigit(id, value) {
+            const digitContainer = document.getElementById(id);
+            const current = digitContainer.querySelector(".current");
+            const next = document.createElement("span");
+            next.textContent = value;
+            next.className = "next";
 
-            // Minta izin notifikasi
-            requestNotificationPermission();
+            if (current && parseInt(current.textContent) === value) return;
 
-            // Jika ada, otomatis mulai hitungan mundur
-            if (savedEventDate) {
-                document.getElementById("eventDate").value = savedEventDate;
-                document.getElementById("input-container").style.display = "none"; // Sembunyikan input dan tombol jika ada tanggal tersimpan
-                calculateCountdown(savedEventDate);
+            digitContainer.appendChild(next);
+
+            const transitionBar = document.createElement("div");
+            transitionBar.className = "transition-bar";
+            digitContainer.appendChild(transitionBar);
+
+            setTimeout(() => {
+                if (current) current.className = "previous";
+                next.className = "current";
+
+                setTimeout(() => {
+                    if (current) current.remove();
+                }, 600);
+
+                transitionBar.style.transform = "translateY(0)";
+                transitionBar.style.opacity = "1";
+            }, 50);
+        }
+
+        function setCountdown() {
+            const dateInput = document.getElementById('dateInput').value;
+            if (!dateInput) return;
+
+            const targetDate = new Date(dateInput).getTime();
+
+            document.querySelector('.countdown').classList.remove('hidden');
+            startCountdown(targetDate);
+        }
+
+        function clearCountdown() {
+            clearInterval(countdownInterval);
+            document.getElementById('days').innerHTML = '';
+            document.getElementById('hours').innerHTML = '';
+            document.getElementById('minutes').innerHTML = '';
+            document.getElementById('seconds').innerHTML = '';
+
+            // Show input and buttons again
+            document.getElementById('dateInput').style.display = 'inline';
+            document.getElementById('setBtn').style.display = 'inline';
+            document.getElementById('clearBtn').classList.add('hidden');
+
+            document.querySelector('.countdown').classList.add('hidden');
+        }
+
+        function loadCountdown() {
+            const savedTargetDate = localStorage.getItem('targetDate');
+            if (savedTargetDate) {
+                const targetDate = parseInt(savedTargetDate);
+                document.querySelector('.countdown').classList.remove('hidden');
+                startCountdown(targetDate);
             }
         }
+
+        window.onload = loadCountdown;
     </script>
 </body>
 </html>
